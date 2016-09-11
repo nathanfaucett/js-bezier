@@ -1,0 +1,39 @@
+{
+  "name": "@nathanfaucett/bezier",
+  "version": "0.0.1",
+  "description": "bezier curves",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nathanfaucett/js-bezier.git"
+  },
+  "main": "src/index.js",
+  "keywords": [
+    "bezier",
+    "bezier.js"
+  ],
+  "scripts": {
+    "bezier": "comn -f ./examples/bezier/src/index.js -o ./examples/bezier/index.js",
+    "test": "npm run test-node",
+    "test-node": "node ./test | ./node_modules/.bin/tap-spec",
+    "test-node-raw": "node ./test",
+    "test-browser-local": "zuul --local 9999 --ui tape -- ./test"
+  },
+  "author": "Nathan Faucett",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "@nathanfaucett/environment": "^0.0.2",
+    "@nathanfaucett/event_listener": "^0.0.1",
+    "@nathanfaucett/comn": "0.0.11",
+    "@nathanfaucett/task": "^0.0.5",
+    "gulp-jsbeautifier": "^2.0.3",
+    "gulp-jshint": "^2.0.1",
+    "jshint": "^2.9.3",
+    "tap-spec": "^4.1.0",
+    "tape": "^4.2.0",
+    "zuul": "^3.11.0"
+  },
+  "dependencies": {
+    "@nathanfaucett/clamp": "^0.0.1"
+  }
+}
