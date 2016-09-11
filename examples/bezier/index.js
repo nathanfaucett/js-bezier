@@ -76,7 +76,7 @@
         }
     };
 
-    global["DxNrGk76-YFl5-49D6-2uGn-p8L6pqmTm3xlq"] = function(asyncDependencies) {
+    global["PH9JP9SC-lyzu-44KH-Jmk0-j880jDARAQsCu"] = function(asyncDependencies) {
         var i = -1,
             il = asyncDependencies.length - 1,
             dependency, index;
@@ -106,7 +106,7 @@
     }
 }([
 function(require, exports, module, undefined, global) {
-/*@=-/var/www/html/node/_canvas/js-bezier/examples/bezier/src/index.js-=@*/
+/*@=-/var/www/html/node/_math/js-bezier2/examples/bezier/src/index.js-=@*/
 var environment = require(1),
     eventListener = require(2),
     bezier = require(3);
@@ -116,21 +116,23 @@ eventListener.on(environment.window, "load", function() {
     var canvas = document.getElementById("canvas"),
         ctx = canvas.getContext("2d"),
         p0 = [0, 0],
-        p1 = [0, 512],
-        p2 = [512, 512],
-        p3 = [512, 0],
+        p1 = [128, 256],
+        p2 = [256, 512],
+        p3 = [384, 256],
+        p4 = [512, 0],
+        p = [p0, p1, p2, p3, p4],
         v0 = [0, 0],
         v1 = [0, 0],
         t = 0;
 
     ctx.beginPath();
 
-    bezier.cubic(v1, t, p0, p1, p2, p3);
+    bezier(v1, p, t);
 
-    for (t = 0; t < 1.01; t += 0.05) {
+    for (t = 0; t < 1; t += 0.1) {
         v0[0] = v1[0];
         v0[1] = v1[1];
-        bezier.cubic(v1, t, p0, p1, p2, p3);
+        bezier(v1, p, t);
         ctx.moveTo(v0[0], v0[1]);
         ctx.lineTo(v1[0], v1[1]);
     }
@@ -325,60 +327,95 @@ if (isFunction(document.addEventListener)) {
 
 },
 function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/bezier@0.0.1/src/index.js-=@*/
-var clamp = require(19);
+/*@=-@nathanfaucett/bezier@0.0.2/src/index.js-=@*/
+var vec2 = require(19);
 
 
-var bezier = exports;
+module.exports = bezier;
 
 
-function linear(out, t, p0, p1) {
-    var p0x = p0[0],
-        p0y = p0[1];
-
-    t = clamp(t, 0.0, 1.0);
-
-    out[0] = p0x + t * (p1[0] - p0x);
-    out[1] = p0y + t * (p1[1] - p0y);
-
-    return out;
+function bezier(out, points, t) {
+    if (t <= 0) {
+        return vec2.copy(out, points[0]);
+    } else if (t >= 1) {
+        return vec2.copy(out, points[points.length - 1]);
+    } else {
+        return vec2.copy(out, casteljau(points, points.length - 1, 0, t));
+    }
 }
 
-function quadratic(out, t, p0, p1, p2) {
-    var one_min_t, one_t_sq, t_sq;
 
-    t = clamp(t, 0.0, 1.0);
-
-    one_min_t = 1.0 - t;
-    one_t_sq = one_min_t * one_min_t;
-    t_sq = t * t;
-
-    out[0] = one_t_sq * p0[0] + 2.0 * one_min_t * t * p1[0] + t_sq * p2[0];
-    out[1] = one_t_sq * p0[1] + 2.0 * one_min_t * t * p1[1] + t_sq * p2[1];
-
-    return out;
-}
-
-function cubic(out, t, p0, p1, p2, p3) {
-    var one_min_t, one_t_sq, one_t_cb, t_sq, t_cb;
-
-    t = clamp(t, 0.0, 1.0);
-
-    one_min_t = 1.0 - t;
-    one_t_sq = one_min_t * one_min_t;
-    one_t_cb = one_t_sq * one_min_t;
-    t_sq = t * t;
-    t_cb = t_sq * t;
-
-    out[0] = one_t_cb * p0[0] + 3 * one_t_sq * t * p1[0] + 3 * one_min_t * t_sq * p2[0] + t_cb * p3[0];
-    out[1] = one_t_cb * p0[1] + 3 * one_t_sq * t * p1[1] + 3 * one_min_t * t_sq * p2[1] + t_cb * p3[1];
-
-    return out;
-}
-
+bezier.casteljau = casteljau;
 bezier.linear = linear;
 bezier.quadratic = quadratic;
 bezier.cubic = cubic;
+
+
+function casteljau(points, i, j, t) {
+    var p0, p1;
+
+    if (i === 0) {
+        return points[j];
+    } else {
+        p0 = casteljau(points, i - 1, j, t);
+        p1 = casteljau(points, i - 1, j + 1, t);
+
+        return vec2.create(
+            (1 - t) * p0[0] + t * p1[0],
+            (1 - t) * p0[1] + t * p1[1]
+        );
+    }
+}
+
+function linear(out, p0, p1, t) {
+    if (t <= 0) {
+        return vec2.copy(out, p0);
+    } else if (t >= 1) {
+        return vec2.copy(out, p1);
+    } else {
+        return vec2.lerp(out, p0, p1, t);
+    }
+}
+
+function quadratic(out, p0, p1, p2, t) {
+    var one_min_t, one_t_sq, t_sq;
+
+    if (t <= 0) {
+        return vec2.copy(out, p0);
+    } else if (t >= 1) {
+        return vec2.copy(out, p2);
+    } else {
+        one_min_t = 1.0 - t;
+        one_t_sq = one_min_t * one_min_t;
+        t_sq = t * t;
+
+        out[0] = one_t_sq * p0[0] + 2.0 * one_min_t * t * p1[0] + t_sq * p2[0];
+        out[1] = one_t_sq * p0[1] + 2.0 * one_min_t * t * p1[1] + t_sq * p2[1];
+
+        return out;
+    }
+}
+
+function cubic(out, p0, p1, p2, p3, t) {
+    var one_min_t, one_t_sq, one_t_cb, t_sq, t_cb;
+
+    if (t <= 0) {
+        return vec2.copy(out, p0);
+    } else if (t >= 1) {
+        return vec2.copy(out, p3);
+    } else {
+        one_min_t = 1.0 - t;
+        one_t_sq = one_min_t * one_min_t;
+        one_t_cb = one_t_sq * one_min_t;
+        t_sq = t * t;
+        t_cb = t_sq * t;
+
+        out[0] = one_t_cb * p0[0] + 3 * one_t_sq * t * p1[0] + 3 * one_min_t * t_sq * p2[0] + t_cb * p3[0];
+        out[1] = one_t_cb * p0[1] + 3 * one_t_sq * t * p1[1] + 3 * one_min_t * t_sq * p2[1] + t_cb * p3[1];
+
+        return out;
+    }
+}
 },
 function(require, exports, module, undefined, global) {
 /*@=-buffer@3.6.0/index.js-=@*/
@@ -2914,6 +2951,829 @@ function isUndefined(value) {
 
 },
 function(require, exports, module, undefined, global) {
+/*@=-@nathanfaucett/vec2@0.0.1/src/index.js-=@*/
+var mathf = require(20),
+    isNumber = require(17);
+
+
+var vec2 = exports;
+
+
+vec2.ArrayType = typeof(Float32Array) !== "undefined" ? Float32Array : mathf.ArrayType;
+
+
+vec2.create = function(x, y) {
+    var out = new vec2.ArrayType(2);
+
+    out[0] = isNumber(x) ? x : 0;
+    out[1] = isNumber(y) ? y : 0;
+
+    return out;
+};
+
+vec2.copy = function(out, a) {
+
+    out[0] = a[0];
+    out[1] = a[1];
+
+    return out;
+};
+
+vec2.clone = function(a) {
+    var out = new vec2.ArrayType(2);
+
+    out[0] = a[0];
+    out[1] = a[1];
+
+    return out;
+};
+
+vec2.set = function(out, x, y) {
+
+    out[0] = isNumber(x) ? x : 0;
+    out[1] = isNumber(y) ? y : 0;
+
+    return out;
+};
+
+vec2.add = function(out, a, b) {
+
+    out[0] = a[0] + b[0];
+    out[1] = a[1] + b[1];
+
+    return out;
+};
+
+vec2.sub = function(out, a, b) {
+
+    out[0] = a[0] - b[0];
+    out[1] = a[1] - b[1];
+
+    return out;
+};
+
+vec2.mul = function(out, a, b) {
+
+    out[0] = a[0] * b[0];
+    out[1] = a[1] * b[1];
+
+    return out;
+};
+
+vec2.div = function(out, a, b) {
+    var bx = b[0],
+        by = b[1];
+
+    out[0] = a[0] * (bx !== 0 ? 1 / bx : bx);
+    out[1] = a[1] * (by !== 0 ? 1 / by : by);
+
+    return out;
+};
+
+vec2.sadd = function(out, a, s) {
+
+    out[0] = a[0] + s;
+    out[1] = a[1] + s;
+
+    return out;
+};
+
+vec2.ssub = function(out, a, s) {
+
+    out[0] = a[0] - s;
+    out[1] = a[1] - s;
+
+    return out;
+};
+
+vec2.smul = function(out, a, s) {
+
+    out[0] = a[0] * s;
+    out[1] = a[1] * s;
+
+    return out;
+};
+
+vec2.sdiv = function(out, a, s) {
+    s = s !== 0 ? 1 / s : s;
+
+    out[0] = a[0] * s;
+    out[1] = a[1] * s;
+
+    return out;
+};
+
+vec2.lengthSqValues = function(x, y) {
+    return x * x + y * y;
+};
+
+vec2.lengthValues = function(x, y) {
+    var lsq = vec2.lengthSqValues(x, y);
+    return lsq !== 0 ? mathf.sqrt(lsq) : lsq;
+};
+
+vec2.invLengthValues = function(x, y) {
+    var lsq = vec2.lengthSqValues(x, y);
+    return lsq !== 0 ? 1 / mathf.sqrt(lsq) : lsq;
+};
+
+vec2.cross = function(a, b) {
+    return a[0] * b[1] - a[1] * b[0];
+};
+
+vec2.dot = function(a, b) {
+    return a[0] * b[0] + a[1] * b[1];
+};
+
+vec2.lengthSq = function(a) {
+    return vec2.dot(a, a);
+};
+
+vec2.length = function(a) {
+    var lsq = vec2.lengthSq(a);
+    return lsq !== 0 ? mathf.sqrt(lsq) : lsq;
+};
+
+vec2.invLength = function(a) {
+    var lsq = vec2.lengthSq(a);
+    return lsq !== 0 ? 1 / mathf.sqrt(lsq) : lsq;
+};
+
+vec2.setLength = function(out, a, length) {
+    var x = a[0],
+        y = a[1],
+        s = length * vec2.invLengthValues(x, y);
+
+    out[0] = x * s;
+    out[1] = y * s;
+
+    return out;
+};
+
+vec2.normalize = function(out, a) {
+    var x = a[0],
+        y = a[1],
+        invlsq = vec2.invLengthValues(x, y);
+
+    out[0] = x * invlsq;
+    out[1] = y * invlsq;
+
+    return out;
+};
+
+vec2.inverse = function(out, a) {
+
+    out[0] = a[0] * -1;
+    out[1] = a[1] * -1;
+
+    return out;
+};
+
+vec2.lerp = function(out, a, b, x) {
+    var lerp = mathf.lerp;
+
+    out[0] = lerp(a[0], b[0], x);
+    out[1] = lerp(a[1], b[1], x);
+
+    return out;
+};
+
+vec2.perp = function(out, a) {
+
+    out[0] = a[1];
+    out[1] = -a[0];
+
+    return out;
+};
+
+vec2.perpR = function(out, a) {
+
+    out[0] = -a[1];
+    out[1] = a[0];
+
+    return out;
+};
+
+vec2.angle = function(a, b) {
+    return Math.acos(vec2.dot(a, b) / (vec2.length(a) * vec2.length(b)));
+};
+
+vec2.min = function(out, a, b) {
+    var ax = a[0],
+        ay = a[1],
+        bx = b[0],
+        by = b[1];
+
+    out[0] = bx < ax ? bx : ax;
+    out[1] = by < ay ? by : ay;
+
+    return out;
+};
+
+vec2.max = function(out, a, b) {
+    var ax = a[0],
+        ay = a[1],
+        bx = b[0],
+        by = b[1];
+
+    out[0] = bx > ax ? bx : ax;
+    out[1] = by > ay ? by : ay;
+
+    return out;
+};
+
+vec2.clamp = function(out, a, min, max) {
+    var x = a[0],
+        y = a[1],
+        minx = min[0],
+        miny = min[1],
+        maxx = max[0],
+        maxy = max[1];
+
+    out[0] = x < minx ? minx : x > maxx ? maxx : x;
+    out[1] = y < miny ? miny : y > maxy ? maxy : y;
+
+    return out;
+};
+
+vec2.transformAngle = function(out, a, angle) {
+    var x = a[0],
+        y = a[1],
+        c = mathf.cos(angle),
+        s = mathf.sin(angle);
+
+    out[0] = x * c - y * s;
+    out[1] = x * s + y * c;
+
+    return out;
+};
+
+vec2.transformMat2 = function(out, a, m) {
+    var x = a[0],
+        y = a[1];
+
+    out[0] = x * m[0] + y * m[2];
+    out[1] = x * m[1] + y * m[3];
+
+    return out;
+};
+
+vec2.transformMat32 = function(out, a, m) {
+    var x = a[0],
+        y = a[1];
+
+    out[0] = x * m[0] + y * m[2] + m[4];
+    out[1] = x * m[1] + y * m[3] + m[5];
+
+    return out;
+};
+
+vec2.transformMat3 = function(out, a, m) {
+    var x = a[0],
+        y = a[1];
+
+    out[0] = x * m[0] + y * m[3] + m[6];
+    out[1] = x * m[1] + y * m[4] + m[7];
+
+    return out;
+};
+
+vec2.transformMat4 = function(out, a, m) {
+    var x = a[0],
+        y = a[1];
+
+    out[0] = x * m[0] + y * m[4] + m[12];
+    out[1] = x * m[1] + y * m[5] + m[13];
+
+    return out;
+};
+
+vec2.transformProjection = function(out, a, m) {
+    var x = a[0],
+        y = a[1],
+        d = x * m[3] + y * m[7] + m[11] + m[15];
+
+    d = d !== 0 ? 1 / d : d;
+
+    out[0] = (x * m[0] + y * m[4] + m[12]) * d;
+    out[1] = (x * m[1] + y * m[5] + m[13]) * d;
+
+    return out;
+};
+
+vec2.positionFromMat32 = function(out, m) {
+
+    out[0] = m[4];
+    out[1] = m[5];
+
+    return out;
+};
+
+vec2.positionFromMat4 = function(out, m) {
+
+    out[0] = m[12];
+    out[1] = m[13];
+
+    return out;
+};
+
+vec2.scaleFromMat2 = function(out, m) {
+
+    out[0] = vec2.lengthValues(m[0], m[2]);
+    out[1] = vec2.lengthValues(m[1], m[3]);
+
+    return out;
+};
+
+vec2.scaleFromMat32 = vec2.scaleFromMat2;
+
+vec2.scaleFromMat3 = function(out, m) {
+
+    out[0] = vec2.lengthValues(m[0], m[3]);
+    out[1] = vec2.lengthValues(m[1], m[4]);
+
+    return out;
+};
+
+vec2.scaleFromMat4 = function(out, m) {
+
+    out[0] = vec2.lengthValues(m[0], m[4]);
+    out[1] = vec2.lengthValues(m[1], m[5]);
+
+    return out;
+};
+
+vec2.equal = function(a, b) {
+    return !(
+        a[0] !== b[0] ||
+        a[1] !== b[1]
+    );
+};
+
+vec2.notEqual = function(a, b) {
+    return (
+        a[0] !== b[0] ||
+        a[1] !== b[1]
+    );
+};
+
+vec2.str = function(out) {
+    return "Vec2(" + out[0] + ", " + out[1] + ")";
+};
+
+vec2.string = vec2.toString = vec2.str;
+
+},
+function(require, exports, module, undefined, global) {
+/*@=-@nathanfaucett/mathf@0.0.1/src/index.js-=@*/
+var keys = require(21),
+    clamp = require(22),
+    isNaNPolyfill = require(23);
+
+
+var mathf = exports,
+
+    NativeMath = global.Math,
+
+    hasFloat32Array = typeof(Float32Array) !== "undefined",
+    NativeFloat32Array = hasFloat32Array ? Float32Array : Array;
+
+
+mathf.ArrayType = NativeFloat32Array;
+
+mathf.PI = NativeMath.PI;
+mathf.TAU = mathf.PI * 2;
+mathf.TWO_PI = mathf.TAU;
+mathf.HALF_PI = mathf.PI * 0.5;
+mathf.FOURTH_PI = mathf.PI * 0.25;
+
+mathf.EPSILON = Number.EPSILON || NativeMath.pow(2, -52);
+
+mathf.TO_RADS = mathf.PI / 180;
+mathf.TO_DEGS = 180 / mathf.PI;
+
+mathf.E = NativeMath.E;
+mathf.LN2 = NativeMath.LN2;
+mathf.LN10 = NativeMath.LN10;
+mathf.LOG2E = NativeMath.LOG2E;
+mathf.LOG10E = NativeMath.LOG10E;
+mathf.SQRT1_2 = NativeMath.SQRT1_2;
+mathf.SQRT2 = NativeMath.SQRT2;
+
+mathf.abs = NativeMath.abs;
+
+mathf.acos = NativeMath.acos;
+mathf.acosh = NativeMath.acosh || function acosh(x) {
+    return mathf.log(x + mathf.sqrt(x * x - 1));
+};
+mathf.asin = NativeMath.asin;
+mathf.asinh = NativeMath.asinh || function asinh(x) {
+    if (x === -Infinity) {
+        return x;
+    } else {
+        return mathf.log(x + mathf.sqrt(x * x + 1));
+    }
+};
+mathf.atan = NativeMath.atan;
+mathf.atan2 = NativeMath.atan2;
+mathf.atanh = NativeMath.atanh || function atanh(x) {
+    return mathf.log((1 + x) / (1 - x)) / 2;
+};
+
+mathf.cbrt = NativeMath.cbrt || function cbrt(x) {
+    var y = mathf.pow(mathf.abs(x), 1 / 3);
+    return x < 0 ? -y : y;
+};
+
+mathf.ceil = NativeMath.ceil;
+
+mathf.clz32 = NativeMath.clz32 || function clz32(value) {
+    value = +value >>> 0;
+    return value ? 32 - value.toString(2).length : 32;
+};
+
+mathf.cos = NativeMath.cos;
+mathf.cosh = NativeMath.cosh || function cosh(x) {
+    return (mathf.exp(x) + mathf.exp(-x)) / 2;
+};
+
+mathf.exp = NativeMath.exp;
+
+mathf.expm1 = NativeMath.expm1 || function expm1(x) {
+    return mathf.exp(x) - 1;
+};
+
+mathf.floor = NativeMath.floor;
+mathf.fround = NativeMath.fround || (hasFloat32Array ?
+    function fround(x) {
+        return new NativeFloat32Array([x])[0];
+    } :
+    function fround(x) {
+        return x;
+    }
+);
+
+mathf.hypot = NativeMath.hypot || function hypot() {
+    var y = 0,
+        i = -1,
+        il = arguments.length - 1,
+        value;
+
+    while (i++ < il) {
+        value = arguments[i];
+
+        if (value === Infinity || value === -Infinity) {
+            return Infinity;
+        } else {
+            y += value * value;
+        }
+    }
+
+    return mathf.sqrt(y);
+};
+
+mathf.imul = NativeMath.imul || function imul(a, b) {
+    var ah = (a >>> 16) & 0xffff,
+        al = a & 0xffff,
+        bh = (b >>> 16) & 0xffff,
+        bl = b & 0xffff;
+
+    return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0) | 0);
+};
+
+mathf.log = NativeMath.log;
+
+mathf.log1p = NativeMath.log1p || function log1p(x) {
+    return mathf.log(1 + x);
+};
+
+mathf.log10 = NativeMath.log10 || function log10(x) {
+    return mathf.log(x) / mathf.LN10;
+};
+
+mathf.log2 = NativeMath.log2 || function log2(x) {
+    return mathf.log(x) / mathf.LN2;
+};
+
+mathf.max = NativeMath.max;
+mathf.min = NativeMath.min;
+
+mathf.pow = NativeMath.pow;
+
+mathf.random = NativeMath.random;
+mathf.round = NativeMath.round;
+
+mathf.sign = NativeMath.sign || function sign(x) {
+    x = +x;
+    if (x === 0 || isNaNPolyfill(x)) {
+        return x;
+    } else {
+        return x > 0 ? 1 : -1;
+    }
+};
+
+mathf.sin = NativeMath.sin;
+mathf.sinh = NativeMath.sinh || function sinh(x) {
+    return (mathf.exp(x) - mathf.exp(-x)) / 2;
+};
+
+mathf.sqrt = NativeMath.sqrt;
+
+mathf.tan = NativeMath.tan;
+mathf.tanh = NativeMath.tanh || function tanh(x) {
+    if (x === Infinity) {
+        return 1;
+    } else if (x === -Infinity) {
+        return -1;
+    } else {
+        return (mathf.exp(x) - mathf.exp(-x)) / (mathf.exp(x) + mathf.exp(-x));
+    }
+};
+
+mathf.trunc = NativeMath.trunc || function trunc(x) {
+    return x < 0 ? mathf.ceil(x) : mathf.floor(x);
+};
+
+mathf.equals = function(a, b, e) {
+    return mathf.abs(a - b) < (e !== void(0) ? e : mathf.EPSILON);
+};
+
+mathf.modulo = function(a, b) {
+    var r = a % b;
+    return (r * b < 0) ? r + b : r;
+};
+
+mathf.standardRadian = function(x) {
+    return mathf.modulo(x, mathf.TWO_PI);
+};
+
+mathf.standardAngle = function(x) {
+    return mathf.modulo(x, 360);
+};
+
+mathf.snap = function(x, y) {
+    var m = x % y;
+    return m < (y * 0.5) ? x - m : x + y - m;
+};
+
+mathf.clamp = clamp;
+
+mathf.clampBottom = function(x, min) {
+    return x < min ? min : x;
+};
+
+mathf.clampTop = function(x, max) {
+    return x > max ? max : x;
+};
+
+mathf.clamp01 = function(x) {
+    if (x < 0) {
+        return 0;
+    } else if (x > 1) {
+        return 1;
+    } else {
+        return x;
+    }
+};
+
+mathf.truncate = function(x, n) {
+    var p = mathf.pow(10, n),
+        num = x * p;
+
+    return (num < 0 ? mathf.ceil(num) : mathf.floor(num)) / p;
+};
+
+mathf.lerp = function(a, b, x) {
+    return a + (b - a) * x;
+};
+
+mathf.lerpRadian = function(a, b, x) {
+    return mathf.standardRadian(a + (b - a) * x);
+};
+
+mathf.lerpAngle = function(a, b, x) {
+    return mathf.standardAngle(a + (b - a) * x);
+};
+
+mathf.lerpCos = function(a, b, x) {
+    var ft = x * mathf.PI,
+        f = (1 - mathf.cos(ft)) * 0.5;
+
+    return a * (1 - f) + b * f;
+};
+
+mathf.lerpCubic = function(v0, v1, v2, v3, x) {
+    var P, Q, R, S, Px, Qx, Rx;
+
+    v0 = v0 || v1;
+    v3 = v3 || v2;
+
+    P = (v3 - v2) - (v0 - v1);
+    Q = (v0 - v1) - P;
+    R = v2 - v0;
+    S = v1;
+
+    Px = P * x;
+    Qx = Q * x;
+    Rx = R * x;
+
+    return (Px * Px * Px) + (Qx * Qx) + Rx + S;
+};
+
+mathf.smoothStep = function(x, min, max) {
+    if (x <= min) {
+        return 0;
+    } else {
+        if (x >= max) {
+            return 1;
+        } else {
+            x = (x - min) / (max - min);
+            return x * x * (3 - 2 * x);
+        }
+    }
+};
+
+mathf.smootherStep = function(x, min, max) {
+    if (x <= min) {
+        return 0;
+    } else {
+        if (x >= max) {
+            return 1;
+        } else {
+            x = (x - min) / (max - min);
+            return x * x * x * (x * (x * 6 - 15) + 10);
+        }
+    }
+};
+
+mathf.pingPong = function(x, length) {
+    length = +length || 1;
+    return length - mathf.abs(x % (2 * length) - length);
+};
+
+mathf.degsToRads = function(x) {
+    return mathf.standardRadian(x * mathf.TO_RADS);
+};
+
+mathf.radsToDegs = function(x) {
+    return mathf.standardAngle(x * mathf.TO_DEGS);
+};
+
+mathf.randInt = function(min, max) {
+    return mathf.round(min + (mathf.random() * (max - min)));
+};
+
+mathf.randFloat = function(min, max) {
+    return min + (mathf.random() * (max - min));
+};
+
+mathf.randSign = function() {
+    return mathf.random() < 0.5 ? 1 : -1;
+};
+
+mathf.shuffle = function(array) {
+    var i = array.length,
+        j, x;
+
+    while (i) {
+        j = (mathf.random() * i--) | 0;
+        x = array[i];
+        array[i] = array[j];
+        array[j] = x;
+    }
+
+    return array;
+};
+
+mathf.randArg = function() {
+    return arguments[(mathf.random() * arguments.length) | 0];
+};
+
+mathf.randChoice = function(array) {
+    return array[(mathf.random() * array.length) | 0];
+};
+
+mathf.randChoiceObject = function(object) {
+    var objectKeys = keys(object);
+    return object[objectKeys[(mathf.random() * objectKeys.length) | 0]];
+};
+
+mathf.isPowerOfTwo = function(x) {
+    return (x & -x) === x;
+};
+
+mathf.floorPowerOfTwo = function(x) {
+    var i = 2,
+        prev;
+
+    while (i < x) {
+        prev = i;
+        i *= 2;
+    }
+
+    return prev;
+};
+
+mathf.ceilPowerOfTwo = function(x) {
+    var i = 2;
+
+    while (i < x) {
+        i *= 2;
+    }
+
+    return i;
+};
+
+var n225 = 0.39269908169872414,
+    n675 = 1.1780972450961724,
+    n1125 = 1.9634954084936207,
+    n1575 = 2.748893571891069,
+    n2025 = 3.5342917352885173,
+    n2475 = 4.319689898685966,
+    n2925 = 5.105088062083414,
+    n3375 = 5.8904862254808625,
+
+    RIGHT = "right",
+    UP_RIGHT = "up_right",
+    UP = "up",
+    UP_LEFT = "up_left",
+    LEFT = "left",
+    DOWN_LEFT = "down_left",
+    DOWN = "down",
+    DOWN_RIGHT = "down_right";
+
+mathf.directionAngle = function(a) {
+    a = mathf.standardRadian(a);
+
+    return (
+        (a >= n225 && a < n675) ? UP_RIGHT :
+        (a >= n675 && a < n1125) ? UP :
+        (a >= n1125 && a < n1575) ? UP_LEFT :
+        (a >= n1575 && a < n2025) ? LEFT :
+        (a >= n2025 && a < n2475) ? DOWN_LEFT :
+        (a >= n2475 && a < n2925) ? DOWN :
+        (a >= n2925 && a < n3375) ? DOWN_RIGHT :
+        RIGHT
+    );
+};
+
+mathf.direction = function(x, y) {
+    var a = mathf.standardRadian(mathf.atan2(y, x));
+
+    return (
+        (a >= n225 && a < n675) ? UP_RIGHT :
+        (a >= n675 && a < n1125) ? UP :
+        (a >= n1125 && a < n1575) ? UP_LEFT :
+        (a >= n1575 && a < n2025) ? LEFT :
+        (a >= n2025 && a < n2475) ? DOWN_LEFT :
+        (a >= n2475 && a < n2925) ? DOWN :
+        (a >= n2925 && a < n3375) ? DOWN_RIGHT :
+        RIGHT
+    );
+};
+
+},
+function(require, exports, module, undefined, global) {
+/*@=-@nathanfaucett/keys@0.0.1/src/index.js-=@*/
+var has = require(24),
+    isNative = require(25),
+    isNullOrUndefined = require(16),
+    isObject = require(9);
+
+
+var nativeKeys = Object.keys;
+
+
+module.exports = keys;
+
+
+function keys(value) {
+    if (isNullOrUndefined(value)) {
+        return [];
+    } else {
+        return nativeKeys(isObject(value) ? value : Object(value));
+    }
+}
+
+if (!isNative(nativeKeys)) {
+    nativeKeys = function keys(value) {
+        var localHas = has,
+            out = [],
+            i = 0,
+            key;
+
+        for (key in value) {
+            if (localHas(value, key)) {
+                out[i++] = key;
+            }
+        }
+
+        return out;
+    };
+}
+
+},
+function(require, exports, module, undefined, global) {
 /*@=-@nathanfaucett/clamp@0.0.1/src/index.js-=@*/
 module.exports = clamp;
 
@@ -2925,6 +3785,188 @@ function clamp(x, min, max) {
         return max;
     } else {
         return x;
+    }
+}
+
+},
+function(require, exports, module, undefined, global) {
+/*@=-@nathanfaucett/is_nan@0.0.1/src/index.js-=@*/
+var isNumber = require(17);
+
+
+module.exports = Number.isNaN || function isNaN(value) {
+    return isNumber(value) && value !== value;
+};
+
+},
+function(require, exports, module, undefined, global) {
+/*@=-@nathanfaucett/has@0.0.1/src/index.js-=@*/
+var isNative = require(25),
+    getPrototypeOf = require(26),
+    isNullOrUndefined = require(16);
+
+
+var nativeHasOwnProp = Object.prototype.hasOwnProperty,
+    baseHas;
+
+
+module.exports = has;
+
+
+function has(object, key) {
+    if (isNullOrUndefined(object)) {
+        return false;
+    } else {
+        return baseHas(object, key);
+    }
+}
+
+if (isNative(nativeHasOwnProp)) {
+    baseHas = function baseHas(object, key) {
+        if (object.hasOwnProperty) {
+            return object.hasOwnProperty(key);
+        } else {
+            return nativeHasOwnProp.call(object, key);
+        }
+    };
+} else {
+    baseHas = function baseHas(object, key) {
+        var proto = getPrototypeOf(object);
+
+        if (isNullOrUndefined(proto)) {
+            return key in object;
+        } else {
+            return (key in object) && (!(key in proto) || proto[key] !== object[key]);
+        }
+    };
+}
+
+},
+function(require, exports, module, undefined, global) {
+/*@=-@nathanfaucett/is_native@0.0.2/src/index.js-=@*/
+var isFunction = require(10),
+    isNullOrUndefined = require(16),
+    escapeRegExp = require(27);
+
+
+var reHostCtor = /^\[object .+?Constructor\]$/,
+
+    functionToString = Function.prototype.toString,
+
+    reNative = RegExp("^" +
+        escapeRegExp(Object.prototype.toString)
+        .replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"
+    ),
+
+    isHostObject;
+
+
+module.exports = isNative;
+
+
+function isNative(value) {
+    return !isNullOrUndefined(value) && (
+        isFunction(value) ?
+        reNative.test(functionToString.call(value)) : (
+            typeof(value) === "object" && (
+                (isHostObject(value) ? reNative : reHostCtor).test(value) || false
+            )
+        )
+    ) || false;
+}
+
+try {
+    String({
+        "toString": 0
+    } + "");
+} catch (e) {
+    isHostObject = function isHostObject() {
+        return false;
+    };
+}
+
+isHostObject = function isHostObject(value) {
+    return !isFunction(value.toString) && typeof(value + "") === "string";
+};
+
+},
+function(require, exports, module, undefined, global) {
+/*@=-@nathanfaucett/get_prototype_of@0.0.1/src/index.js-=@*/
+var isObject = require(9),
+    isNative = require(25),
+    isNullOrUndefined = require(16);
+
+
+var nativeGetPrototypeOf = Object.getPrototypeOf,
+    baseGetPrototypeOf;
+
+
+module.exports = getPrototypeOf;
+
+
+function getPrototypeOf(value) {
+    if (isNullOrUndefined(value)) {
+        return null;
+    } else {
+        return baseGetPrototypeOf(value);
+    }
+}
+
+if (isNative(nativeGetPrototypeOf)) {
+    baseGetPrototypeOf = function baseGetPrototypeOf(value) {
+        return nativeGetPrototypeOf(isObject(value) ? value : Object(value)) || null;
+    };
+} else {
+    if ("".__proto__ === String.prototype) {
+        baseGetPrototypeOf = function baseGetPrototypeOf(value) {
+            return value.__proto__ || null;
+        };
+    } else {
+        baseGetPrototypeOf = function baseGetPrototypeOf(value) {
+            return value.constructor ? value.constructor.prototype : null;
+        };
+    }
+}
+
+},
+function(require, exports, module, undefined, global) {
+/*@=-@nathanfaucett/escape_regexp@0.0.1/src/index.js-=@*/
+var toString = require(28);
+
+
+var reRegExpChars = /[.*+?\^${}()|\[\]\/\\]/g,
+    reHasRegExpChars = new RegExp(reRegExpChars.source);
+
+
+module.exports = escapeRegExp;
+
+
+function escapeRegExp(string) {
+    string = toString(string);
+    return (
+        (string && reHasRegExpChars.test(string)) ?
+        string.replace(reRegExpChars, "\\$&") :
+        string
+    );
+}
+
+},
+function(require, exports, module, undefined, global) {
+/*@=-@nathanfaucett/to_string@0.0.1/src/index.js-=@*/
+var isString = require(15),
+    isNullOrUndefined = require(16);
+
+
+module.exports = toString;
+
+
+function toString(value) {
+    if (isString(value)) {
+        return value;
+    } else if (isNullOrUndefined(value)) {
+        return "";
+    } else {
+        return value + "";
     }
 }
 

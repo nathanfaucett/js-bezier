@@ -1,6 +1,6 @@
 {
   "name": "@nathanfaucett/bezier",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "bezier curves",
   "repository": {
     "type": "git",
@@ -34,6 +34,6 @@
     "zuul": "^3.11.0"
   },
   "dependencies": {
-    "@nathanfaucett/clamp": "^0.0.1"
+    "@nathanfaucett/vec2": "^0.0.1"
   }
 }
