@@ -3,27 +3,18 @@ var tape = require("tape"),
 
 
 tape("bezier(out, points, t)", function(assert) {
-    var v = [0, 0];
-    assert.deepEquals(bezier(v, [
-        [0, 0],
-        [0.1, 0.25],
-        [0.2, 0.5],
-        [0.6, 0.5],
-        [0.8, 0.25],
-        [1, 0]
-    ], 0.25), [0.15771484375, 0.2783203125]);
-    assert.deepEquals(bezier(v, [
-        [0, 0],
-        [0, 0.5],
-        [1, 0.5],
-        [1, 0]
-    ], 0.5), [0.5, 0.375]);
-    assert.deepEquals(bezier(v, [
-        [0, 0],
-        [0, 0.5],
-        [1, 0.5],
-        [1, 0]
-    ], 0.75), [0.84375, 0.28125]);
+    var v = [0, 0],
+        points = [
+            [0, 0],
+            [0.1, 0.25],
+            [0.2, 0.5],
+            [0.6, 0.5],
+            [0.8, 0.25],
+            [1, 0]
+        ];
+    assert.deepEquals(bezier(v, points, 0.25), [0.15771484375, 0.2783203125]);
+    assert.deepEquals(bezier(v, points, 0.5), [0.421875, 0.390625]);
+    assert.deepEquals(bezier(v, points, 0.75), [0.73095703125, 0.2783203125]);
     assert.end();
 });
 

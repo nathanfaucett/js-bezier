@@ -76,7 +76,7 @@
         }
     };
 
-    global["PH9JP9SC-lyzu-44KH-Jmk0-j880jDARAQsCu"] = function(asyncDependencies) {
+    global["PYNorp9r-6eA0-4kS5-dolj-szW7jUUmMFTDe"] = function(asyncDependencies) {
         var i = -1,
             il = asyncDependencies.length - 1,
             dependency, index;
@@ -327,7 +327,7 @@ if (isFunction(document.addEventListener)) {
 
 },
 function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/bezier@0.0.2/src/index.js-=@*/
+/*@=-@nathanfaucett/bezier@0.0.3/src/index.js-=@*/
 var vec2 = require(19);
 
 
@@ -335,12 +335,29 @@ module.exports = bezier;
 
 
 function bezier(out, points, t) {
+    var n;
+
     if (t <= 0) {
         return vec2.copy(out, points[0]);
     } else if (t >= 1) {
         return vec2.copy(out, points[points.length - 1]);
     } else {
-        return vec2.copy(out, casteljau(points, points.length - 1, 0, t));
+        n = points.length;
+
+        switch (n) {
+            case 0:
+                return vec2.set(out, 0, 0);
+            case 1:
+                return vec2.copy(out, points[0]);
+            case 2:
+                return linear(out, points[0], points[1], t);
+            case 3:
+                return quadratic(out, points[0], points[1], points[2], t);
+            case 4:
+                return cubic(out, points[0], points[1], points[2], points[3], t);
+            default:
+                return vec2.copy(out, casteljau(points, n - 1, 0, t));
+        }
     }
 }
 
