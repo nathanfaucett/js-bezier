@@ -1,6 +1,6 @@
 {
   "name": "@nathanfaucett/bezier",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "bezier curves",
   "repository": {
     "type": "git",
@@ -23,9 +23,9 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "@nathanfaucett/environment": "^0.0.2",
-    "@nathanfaucett/event_listener": "^0.0.1",
-    "@nathanfaucett/comn": "0.0.11",
-    "@nathanfaucett/task": "^0.0.5",
+    "@nathanfaucett/event_listener": "^0.0.2",
+    "@nathanfaucett/comn": "^0.0.12",
+    "@nathanfaucett/task": "^0.0.7",
     "gulp-jsbeautifier": "^2.0.3",
     "gulp-jshint": "^2.0.1",
     "jshint": "^2.9.3",
@@ -34,6 +34,6 @@
     "zuul": "^3.11.0"
   },
   "dependencies": {
-    "@nathanfaucett/vec2": "^0.0.1"
+    "@nathanfaucett/vec2": "^0.0.2"
   }
 }

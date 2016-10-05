@@ -76,7 +76,7 @@
         }
     };
 
-    global["PYNorp9r-6eA0-4kS5-dolj-szW7jUUmMFTDe"] = function(asyncDependencies) {
+    global["4ZVLaCih-rlhN-4bi6-A9vs-vx9r0froaOiyy"] = function(asyncDependencies) {
         var i = -1,
             il = asyncDependencies.length - 1,
             dependency, index;
@@ -180,12 +180,12 @@ environment.document = typeof(document) !== "undefined" ? document : {};
 
 },
 function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/event_listener@0.0.1/src/index.js-=@*/
+/*@=-@nathanfaucett/event_listener@0.0.2/src/index.js-=@*/
 var process = require(5);
 var isObject = require(9),
     isFunction = require(10),
-    environment = require(11),
-    eventTable = require(12);
+    environment = require(1),
+    eventTable = require(11);
 
 
 var eventListener = module.exports,
@@ -327,8 +327,8 @@ if (isFunction(document.addEventListener)) {
 
 },
 function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/bezier@0.0.3/src/index.js-=@*/
-var vec2 = require(19);
+/*@=-@nathanfaucett/bezier@0.0.4/src/index.js-=@*/
+var vec2 = require(18);
 
 
 module.exports = bezier;
@@ -2397,7 +2397,7 @@ module.exports = Array.isArray || function (arr) {
 },
 function(require, exports, module, undefined, global) {
 /*@=-@nathanfaucett/is_object@0.0.1/src/index.js-=@*/
-var isNull = require(13);
+var isNull = require(12);
 
 
 module.exports = isObject;
@@ -2434,40 +2434,9 @@ module.exports = isFunction;
 
 },
 function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/environment@0.0.1/src/index.js-=@*/
-var environment = exports,
-
-    hasWindow = typeof(window) !== "undefined",
-    userAgent = hasWindow ? window.navigator.userAgent : "";
-
-
-environment.worker = typeof(importScripts) !== "undefined";
-
-environment.browser = environment.worker || !!(
-    hasWindow &&
-    typeof(navigator) !== "undefined" &&
-    window.document
-);
-
-environment.node = !environment.worker && !environment.browser;
-
-environment.mobile = environment.browser && /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-
-environment.window = (
-    hasWindow ? window :
-    typeof(global) !== "undefined" ? global :
-    typeof(self) !== "undefined" ? self : {}
-);
-
-environment.pixelRatio = environment.window.devicePixelRatio || 1;
-
-environment.document = typeof(document) !== "undefined" ? document : {};
-
-},
-function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/event_listener@0.0.1/src/event_table.js-=@*/
-var isNode = require(14),
-    environment = require(11);
+/*@=-@nathanfaucett/event_listener@0.0.2/src/event_table.js-=@*/
+var isNode = require(13),
+    environment = require(1);
 
 
 var window = environment.window,
@@ -2885,9 +2854,9 @@ function isNull(value) {
 },
 function(require, exports, module, undefined, global) {
 /*@=-@nathanfaucett/is_node@0.0.1/src/index.js-=@*/
-var isString = require(15),
-    isNullOrUndefined = require(16),
-    isNumber = require(17),
+var isString = require(14),
+    isNullOrUndefined = require(15),
+    isNumber = require(16),
     isFunction = require(10);
 
 
@@ -2923,8 +2892,8 @@ function isString(value) {
 },
 function(require, exports, module, undefined, global) {
 /*@=-@nathanfaucett/is_null_or_undefined@0.0.1/src/index.js-=@*/
-var isNull = require(13),
-    isUndefined = require(18);
+var isNull = require(12),
+    isUndefined = require(17);
 
 
 module.exports = isNullOrUndefined;
@@ -2968,9 +2937,9 @@ function isUndefined(value) {
 
 },
 function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/vec2@0.0.1/src/index.js-=@*/
-var mathf = require(20),
-    isNumber = require(17);
+/*@=-@nathanfaucett/vec2@0.0.2/src/index.js-=@*/
+var mathf = require(19),
+    isNumber = require(16);
 
 
 var vec2 = exports;
@@ -3342,10 +3311,10 @@ vec2.string = vec2.toString = vec2.str;
 
 },
 function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/mathf@0.0.1/src/index.js-=@*/
-var keys = require(21),
-    clamp = require(22),
-    isNaNPolyfill = require(23);
+/*@=-@nathanfaucett/mathf@0.0.3/src/index.js-=@*/
+var keys = require(20),
+    clamp = require(21),
+    isNaNPolyfill = require(22);
 
 
 var mathf = exports,
@@ -3470,6 +3439,14 @@ mathf.log10 = NativeMath.log10 || function log10(x) {
 
 mathf.log2 = NativeMath.log2 || function log2(x) {
     return mathf.log(x) / mathf.LN2;
+};
+
+mathf.fac = function fac(n) {
+    if (n < 2) {
+        return 1;
+    } else {
+        return n * fac(n - 1);
+    }
 };
 
 mathf.max = NativeMath.max;
@@ -3751,10 +3728,10 @@ mathf.direction = function(x, y) {
 
 },
 function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/keys@0.0.1/src/index.js-=@*/
-var has = require(24),
-    isNative = require(25),
-    isNullOrUndefined = require(16),
+/*@=-@nathanfaucett/keys@0.0.2/src/index.js-=@*/
+var has = require(23),
+    isNative = require(24),
+    isNullOrUndefined = require(15),
     isObject = require(9);
 
 
@@ -3807,8 +3784,8 @@ function clamp(x, min, max) {
 
 },
 function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/is_nan@0.0.1/src/index.js-=@*/
-var isNumber = require(17);
+/*@=-@nathanfaucett/is_nan@0.0.2/src/index.js-=@*/
+var isNumber = require(16);
 
 
 module.exports = Number.isNaN || function isNaN(value) {
@@ -3817,10 +3794,10 @@ module.exports = Number.isNaN || function isNaN(value) {
 
 },
 function(require, exports, module, undefined, global) {
-/*@=-@nathanfaucett/has@0.0.1/src/index.js-=@*/
-var isNative = require(25),
-    getPrototypeOf = require(26),
-    isNullOrUndefined = require(16);
+/*@=-@nathanfaucett/has@0.0.2/src/index.js-=@*/
+var isNative = require(24),
+    getPrototypeOf = require(25),
+    isNullOrUndefined = require(15);
 
 
 var nativeHasOwnProp = Object.prototype.hasOwnProperty,
@@ -3862,8 +3839,8 @@ if (isNative(nativeHasOwnProp)) {
 function(require, exports, module, undefined, global) {
 /*@=-@nathanfaucett/is_native@0.0.2/src/index.js-=@*/
 var isFunction = require(10),
-    isNullOrUndefined = require(16),
-    escapeRegExp = require(27);
+    isNullOrUndefined = require(15),
+    escapeRegExp = require(26);
 
 
 var reHostCtor = /^\[object .+?Constructor\]$/,
@@ -3910,8 +3887,8 @@ isHostObject = function isHostObject(value) {
 function(require, exports, module, undefined, global) {
 /*@=-@nathanfaucett/get_prototype_of@0.0.1/src/index.js-=@*/
 var isObject = require(9),
-    isNative = require(25),
-    isNullOrUndefined = require(16);
+    isNative = require(24),
+    isNullOrUndefined = require(15);
 
 
 var nativeGetPrototypeOf = Object.getPrototypeOf,
@@ -3948,7 +3925,7 @@ if (isNative(nativeGetPrototypeOf)) {
 },
 function(require, exports, module, undefined, global) {
 /*@=-@nathanfaucett/escape_regexp@0.0.1/src/index.js-=@*/
-var toString = require(28);
+var toString = require(27);
 
 
 var reRegExpChars = /[.*+?\^${}()|\[\]\/\\]/g,
@@ -3970,8 +3947,8 @@ function escapeRegExp(string) {
 },
 function(require, exports, module, undefined, global) {
 /*@=-@nathanfaucett/to_string@0.0.1/src/index.js-=@*/
-var isString = require(15),
-    isNullOrUndefined = require(16);
+var isString = require(14),
+    isNullOrUndefined = require(15);
 
 
 module.exports = toString;
